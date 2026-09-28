@@ -10,7 +10,7 @@ Uses the GitHub MCP server (or `gh`). You are the reviewer, not the author: do n
 0. First pass, deterministic: run the same Gemini reviewer CI uses, from the IDE
    terminal. It posts inline comments and a summary, skips what it posted before,
    and resolves its own threads that no longer apply:
-   `GITHUB_TOKEN=$(gh auth token) GITHUB_REPOSITORY=<owner/repo> antigravity-review --pr <n>`
+   `GITHUB_TOKEN=$(gh auth token) GITHUB_REPOSITORY=<owner/repo> REVIEW_EXCLUDE_GLOBS="demo/**" antigravity-review --pr <n>`
    In IDE mode (`SDLC_MODE=ide`) this is the review; its open conversations block
    the merge. Then add your own judgment on top with the steps below.
 1. Fetch the PR: title, description (the ticket), and the diff (`gh pr diff <n>`).
