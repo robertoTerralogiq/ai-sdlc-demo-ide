@@ -23,6 +23,8 @@ log = logging.getLogger("antigravity_reviewer")
 
 GUIDELINES_PATHS = (".github/review-guidelines.md",)
 
+IDE_STATUS_CONTEXT = "stage-2: ai-review (ide)"
+
 EXIT_OK = 0
 EXIT_GATE = 1
 EXIT_CONFIG = 2
@@ -245,6 +247,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if os.environ.get("GITHUB_STEP_SUMMARY"):
             with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
                 fh.write(summary_body + "\n")
+
+    # Outside Actions (IDE mode) nothing else records that this commit was reviewed,
+    # so post a status on it. Branch protection requires it, and a new push lacks it.
+    if not os.environ.get("GITHUB_ACTIONS") and not settings.dry_run:
+        state = "failure" if tripped else "success"
+        client.set_status(head_sha, state, f"{len(items)} finding(s), gate: {settings.fail_on}",
+                          IDE_STATUS_CONTEXT)
+        log.info("set commit status %r = %s on %s", IDE_STATUS_CONTEXT, state, head_sha[:7])
 
     if tripped:
         log.error("gate: at least one finding is %s or worse", settings.fail_on)

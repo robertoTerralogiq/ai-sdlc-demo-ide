@@ -186,6 +186,12 @@ class GitHubClient:
 
     # --- writing ---------------------------------------------------------
 
+    def set_status(self, sha: str, state: str, description: str, context: str) -> None:
+        """Commit status on the reviewed commit, so branch protection can require it."""
+        self._http.post(f"/statuses/{sha}", json={
+            "state": state, "context": context, "description": description[:140],
+        }).raise_for_status()
+
     def resolve_thread(self, thread_id: str, reply: str) -> None:
         self._graphql(
             """mutation($id: ID!, $body: String!) {

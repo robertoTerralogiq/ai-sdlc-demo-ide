@@ -78,3 +78,10 @@ def test_existing_comments_merge_review_and_conversation_comments():
         {"body": "fp", "new_path": "a.py", "new_line": 3},
         {"body": "summary", "new_path": None, "new_line": None},
     ]
+
+
+def test_set_status_posts_on_the_reviewed_commit():
+    client, sent = make_client([])
+    client.set_status("HEAD", "failure", "3 finding(s)", "stage-2: ai-review (ide)")
+    assert sent == [("POST", "/repos/o/r/statuses/HEAD",
+                     {"state": "failure", "context": "stage-2: ai-review (ide)", "description": "3 finding(s)"})]
